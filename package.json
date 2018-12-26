@@ -4,6 +4,7 @@
   "description": "Basic CRUD operations",
   "main": "app.js",
   "scripts": {
+    "start": "node app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -17,7 +18,10 @@
   },
   "homepage": "https://github.com/adamszaruga/crud#readme",
   "dependencies": {
+    "body-parser": "^1.18.3",
+    "express": "^4.16.4",
+    "express-graphql": "^0.7.1",
     "faker": "^4.1.0",
-    "joi": "^14.3.0"
+    "graphql": "^14.0.2"
   }
 }
