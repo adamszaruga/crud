@@ -5,7 +5,7 @@ const randomTarget = () => {
         id: Faker.random.uuid(),
         name: Faker.company.companyName(),
         status: ['researching', 'pending', 'approved', 'declined'][Math.floor(Math.random() * 4)],
-        contacts: []
+        contactIds: []
     };
 }
 
@@ -26,7 +26,7 @@ let db = {
 
 db.contacts.forEach(contact=>{
     let randomTarget = db.targets[Math.floor(Math.random()*db.targets.length)];
-    randomTarget.contacts.push(contact.id);
+    randomTarget.contactIds.push(contact.id);
     contact.targetId = randomTarget.id;
 });
 

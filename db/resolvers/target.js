@@ -1,11 +1,11 @@
 const Contact = require('./contact');
 
 class Target {
-    constructor({name, id, status, contacts}) {
+    constructor({name, id, status, contactIds}) {
         this.name = name;
         this.id = id;
         this.status = status;
-        this.contactIds = contacts;
+        this.contactIds = contactIds;
     }
 
     contacts() {
