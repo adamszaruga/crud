@@ -1,8 +1,9 @@
 import React from 'react';
+import JSONPretty from 'react-json-pretty';
 
-const Targets = () => (
+const Targets = ({data}) => (
     <div>
-       Targets
+        <JSONPretty json={data} />
     </div>
 )
 
