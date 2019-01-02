@@ -1,10 +1,10 @@
 import React from 'react';
 import { Query } from "react-apollo";
-import { getTargets } from '../GraphQL/queries';
+import { GetTargets } from '../GraphQL/queries';
 
 export default ({Child}) => (
     <Query
-        query={getTargets}
+        query={GetTargets}
     >
         {({ loading, error, data }) => {
             if (loading) return <p>Loading...</p>;

@@ -1,6 +1,6 @@
 import gql from "graphql-tag";
 
-export const getContacts = gql`
+export const GetContacts = gql`
 {
     getContacts {
         id
@@ -15,7 +15,7 @@ export const getContacts = gql`
     }
 }`;
 
-export const getTargets = gql`
+export const GetTargets = gql`
 {
     getTargets {
         id

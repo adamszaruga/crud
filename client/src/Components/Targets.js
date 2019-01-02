@@ -1,19 +1,14 @@
 import React from 'react';
-import { Users, Briefcase, Map } from 'react-feather';
+import { Users } from 'react-feather';
 import { compose, withHandlers, withState } from 'recompose';
 import { withRouter, NavLink, Route } from 'react-router-dom';
 import Target from './Target.js';
+import NewTargetMutation from '../HOCs/NewTargetMutation';
 
 const enhance = compose(
     withRouter,
     withState('filter', 'setFilter', ''),
     withHandlers({
-        addTarget: props => () => {
-            // doSomething().then(({ id }) => {
-            //     props.history.push(`/owners/${id}`)
-            // })
-            alert('add');
-        },
         filterTargets: props => () => {
             return props.data.getTargets.filter((target) => {
                 var keys = Object.keys(target);
@@ -47,14 +42,32 @@ const STATUS_COLORS = {
 }
 
 const NEW_TARGET_NAME = 'New Target'
+const NEW_TARGET_STATUS = 'researching'
 
-const Targets = ({data, addTarget, filterTargets, setFilter, match}) => (
+const Targets = ({data, filterTargets, setFilter, match, history}) => (
 <div>
     <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
         <h1 className="h2">Targets</h1>
         <div className="btn-toolbar mb-2 mb-md-0">
             <div className="btn-group mr-2">
-                <button className="btn btn-sm btn-outline-secondary" onClick={addTarget}>New Target</button>
+                <NewTargetMutation 
+                    Child={({mutationTrigger, data})=>(
+                            <button className="btn btn-sm btn-outline-secondary" 
+                                    onClick={()=>{
+                                        mutationTrigger({ 
+                                            variables: { 
+                                                input: { 
+                                                    name: NEW_TARGET_NAME, 
+                                                    status: NEW_TARGET_STATUS 
+                                                }
+                                            }
+                                        }).then(({data: { createTarget }})=>{
+                                            history.push(`/targets/${createTarget.id}`);
+                                        });
+                                    }}>New Target</button>
+                    )}
+                />
+                
             </div>
         </div>
     </div>
