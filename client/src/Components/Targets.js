@@ -2,6 +2,8 @@ import React from 'react';
 import { Users, Briefcase, Map } from 'react-feather';
 import { compose, withHandlers, withState } from 'recompose';
 import { withRouter, NavLink, Route } from 'react-router-dom';
+import Target from './Target.js';
+
 const enhance = compose(
     withRouter,
     withState('filter', 'setFilter', ''),
@@ -44,6 +46,8 @@ const STATUS_COLORS = {
     declined: 'danger'
 }
 
+const NEW_TARGET_NAME = 'New Target'
+
 const Targets = ({data, addTarget, filterTargets, setFilter, match}) => (
 <div>
     <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
@@ -63,7 +67,7 @@ const Targets = ({data, addTarget, filterTargets, setFilter, match}) => (
                 data.getTargets.length === 0
                 ? 'No targets'
                 : filterTargets().map((target) => (
-                    <NavLink exact to={`${match.path}/${target.id}`} className="list-group-item list-group-item-action flex-column align-items-start" key={target.id}>
+                    <NavLink exact to={`/targets/${target.id}`} className="list-group-item list-group-item-action flex-column align-items-start" key={target.id}>
                         <div className="d-flex w-100 justify-content-between align-items-baseline">
                             <h5>{target.name}</h5>
                             <span className={`badge badge-${STATUS_COLORS[target.status]}`}>{target.status}</span>
@@ -79,21 +83,19 @@ const Targets = ({data, addTarget, filterTargets, setFilter, match}) => (
                 ))
             }
         </div>
-{/* 
         {
-            !isLoaded(owners)
-                ? ''
-                : <Route exact path={`${match.path}/:id`} render={({ match }) => {
-                    let owner = owners.find(owner => owner.id === match.params.id);
-                    return <Owner key={owner ? owner.id : 'noownerfound'}
-                        owner={owner}
-                        deleteOwner={deleteOwner}
-                        updateOwner={updateOwner}
-                        editMode={owner ? (owner.name === NEW_OWNER_NAME ? true : false) : false} />
-                }} />
-        } */}
+            <Route exact path={`${match.path}/:id`} render={({ match }) => {
+                let target = data.getTargets.find(target => target.id === match.params.id);
+                return target
+                    ? <Target key={target.id}
+                        target={target}
+                        editMode={target ? (target.name === NEW_TARGET_NAME) : false} />
+                    : ''
 
 
+
+            }} />
+        }
     </div>
 </div>
 )

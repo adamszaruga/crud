@@ -7,6 +7,7 @@ export const getContacts = gql`
         name
         phone
         email
+        title
         target {
             id
             name

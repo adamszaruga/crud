@@ -2,6 +2,8 @@ import React from 'react';
 import { Target, Briefcase, Map } from 'react-feather';
 import { compose, withHandlers, withState } from 'recompose';
 import { withRouter, NavLink, Route } from 'react-router-dom';
+import Contact from './Contact.js';
+
 const enhance = compose(
     withRouter,
     withState('filter', 'setFilter', ''),
@@ -35,6 +37,8 @@ const enhance = compose(
         }
     }),
 )
+
+const NEW_CONTACT_NAME = 'New Contact';
 
 const Contacts = ({ data, addContact, filterContacts, setFilter, match }) => (
     <div>
@@ -70,6 +74,19 @@ const Contacts = ({ data, addContact, filterContacts, setFilter, match }) => (
                         ))
                 }
             </div>
+            {
+                <Route exact path={`${match.path}/:id`} render={({ match }) => {
+                    let contact = data.getContacts.find(contact => contact.id === match.params.id);
+                    return contact
+                        ? <Contact key={contact.id}
+                            contact={contact}
+                            editMode={contact && (contact.name === NEW_CONTACT_NAME)} />
+                        : ''
+
+
+
+                }} />
+            }
         </div>
     </div>
 )

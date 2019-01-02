@@ -22,7 +22,8 @@ class App extends Component {
             <main role="main" className="col-md-10 ml-sm-auto col-lg-10 px-4">
               <Switch>
                 <Route exact path="/" render={() => <TargetsQuery Child={Targets} />} />
-                <Route exact path="/contacts" render={() => <ContactsQuery Child={Contacts} />} />
+                <Route path="/targets" render={() => <TargetsQuery Child={Targets} />} />
+                <Route path="/contacts" render={() => <ContactsQuery Child={Contacts} />} />
               </Switch>
             </main>
           </div>
