@@ -64,9 +64,9 @@ module.exports = {
                     return true;
                 }
             })
-            return true;
+            return id;
         } else {
-            return false;
+            return null;
         }
     }
 }

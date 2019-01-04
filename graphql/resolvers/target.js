@@ -88,9 +88,9 @@ module.exports = {
             contacts.forEach(contact => {
                 if (contact.targetId === id) contact.targetId = undefined;
             });
-            return true;
+            return id;
         } else {
-            return false;
+            return null;
         }
     }
 }

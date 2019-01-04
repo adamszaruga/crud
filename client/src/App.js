@@ -7,9 +7,6 @@ import Sidebar from './Components/Sidebar';
 import Targets from './Components/Targets';
 import Contacts from './Components/Contacts';
 
-import TargetsQuery from './HOCs/TargetsQuery';
-import ContactsQuery from './HOCs/ContactsQuery';
-
 class App extends Component {
   render() {
     return (
@@ -21,9 +18,9 @@ class App extends Component {
 
             <main role="main" className="col-md-10 ml-sm-auto col-lg-10 px-4">
               <Switch>
-                <Route exact path="/" render={() => <TargetsQuery Child={Targets} />} />
-                <Route path="/targets" render={() => <TargetsQuery Child={Targets} />} />
-                <Route path="/contacts" render={() => <ContactsQuery Child={Contacts} />} />
+                <Route exact path="/" component={Targets} />
+                <Route path="/targets" component={Targets} />
+                <Route path="/contacts" component={ Contacts } />
               </Switch>
             </main>
           </div>

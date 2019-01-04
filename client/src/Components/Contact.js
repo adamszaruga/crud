@@ -1,14 +1,80 @@
 import React from 'react';
 import { User, Trash2, Edit2 } from 'react-feather';
 import { compose, withHandlers, withState } from 'recompose';
+import { withRouter } from 'react-router-dom';
 import { withFormData, withIsSubmitting, withError, withValidationErrors } from '../HOCs/forms';
-// import ActionModal from './ActionModal';
+import withUpdateContact from '../HOCs/UpdateContactMutation';
+import withDeleteContact from '../HOCs/DeleteContactMutation';
+import ActionModal from './ActionModal';
 
 let DELETE_MODAL_ID = "deleteModal";
 
+const enhance = compose(
+    withRouter,
+    withUpdateContact,
+    withDeleteContact,
+    withFormData('contact'),
+    withIsSubmitting,
+    withError,
+    withValidationErrors,
+    withState('editMode', 'setEditMode', ({ editMode }) => editMode),
+    withHandlers({
+        onSubmit: ({
+            formData,
+            setValidationErrors,
+            setIsSubmitting,
+            setEditMode,
+            contact,
+            updateContact,
+        }) => event => {
+            event.preventDefault();
+            if (formData.name.length === 0) {
+                return setValidationErrors({ name: 'Name is required' });
+            }
+            setValidationErrors({});
+            setIsSubmitting(true);
+
+            updateContact({
+                variables: {
+                    input: {
+                        ...formData,
+                        id: undefined,
+                        target: undefined,
+                        __typename: undefined,
+                        targetId: formData.target ? formData.target.id : undefined
+                    },
+                    id: contact.id
+                }
+            }).then(({ data: { updateContact } })=>{
+                setIsSubmitting(false);
+                setEditMode(false);
+            })
+
+        },
+        handleDelete: ({
+            history,
+            contact,
+            deleteContact,
+        }) => event => {
+            event.preventDefault();
+            deleteContact({
+                variables: {
+                    id: contact.id
+                }
+            }).then(({ data: { deleteContact } }) => {
+                if (deleteContact) {
+                    history.push('/contacts');
+                }
+            })
+
+        },
+    })
+);
+
+
 const Contact = ({
     contact,
-    deleteContact,
+    handleDelete,
     editMode,
     error,
     errors,
@@ -30,7 +96,7 @@ const Contact = ({
                                     <input
                                         required
                                         readOnly={!editMode}
-                                        value={formData.name}
+                                        value={formData.name || ''}
                                         type="text"
                                         className="form-control"
                                         name="name"
@@ -49,7 +115,7 @@ const Contact = ({
                             <input
                                 required
                                 readOnly={!editMode}
-                                value={formData.title}
+                                value={formData.title || ''}
                                 type="text"
                                 className="form-control"
                                 name="title"
@@ -64,7 +130,7 @@ const Contact = ({
                             <input
                                 required
                                 readOnly={!editMode}
-                                value={formData.phone}
+                                value={formData.phone || ''}
                                 type="text"
                                 className="form-control"
                                 name="phone"
@@ -79,7 +145,7 @@ const Contact = ({
                             <input
                                 required
                                 readOnly={!editMode}
-                                value={formData.email}
+                                value={formData.email || ''}
                                 type="text"
                                 className="form-control"
                                 name="email"
@@ -105,48 +171,14 @@ const Contact = ({
                 </div>
 
             </div>
-            {/* <ActionModal
+            <ActionModal
                 modalId={DELETE_MODAL_ID}
-                action={() => deleteContact(project)}
-                title={project.name}
-                message="Are you sure you want to delete this project?"
-                actionText="Delete" /> */}
+                action={handleDelete}
+                title={contact.name}
+                message="Are you sure you want to delete this contact?"
+                actionText="Delete" />
         </div>
     )
 
-export default compose(
-    withFormData('contact'),
-    withIsSubmitting,
-    withError,
-    withValidationErrors,
-    withState('editMode', 'setEditMode', ({ editMode }) => editMode),
-    withHandlers({
-        onSubmit: ({
-            formData,
-            setValidationErrors,
-            setIsSubmitting,
-            setEditMode,
-            setError,
-            setFormData,
-            setOutput,
-            updateContact,
-            project
-        }) => event => {
-            // event.preventDefault();
-            // // validate however
-            // if (formData.name.length === 0) {
-            //     return setValidationErrors({ name: 'Name is required' });
-            // }
-            // setValidationErrors({});
 
-            // setIsSubmitting(true);
-
-            // updateContact(project, { ...formData }).then(() => {
-            //     setEditMode(false);
-            //     setIsSubmitting(false);
-            //     setError(null);
-            // });
-
-        },
-    })
-)(Contact);
+export default enhance(Contact);

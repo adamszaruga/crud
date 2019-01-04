@@ -1,14 +1,81 @@
 import React from 'react';
 import { Target as TargetIcon, Trash2, Edit2 } from 'react-feather';
 import { compose, withHandlers, withState } from 'recompose';
+import { withRouter } from 'react-router-dom';
 import { withFormData, withIsSubmitting, withError, withValidationErrors } from '../HOCs/forms';
-// import ActionModal from './ActionModal';
+import withUpdateTarget from '../HOCs/UpdateTargetMutation';
+import withDeleteTarget from '../HOCs/DeleteTargetMutation'
+import ActionModal from './ActionModal';
 
 let DELETE_MODAL_ID = "deleteModal";
 
+const enhance = compose(
+    withRouter,
+    withUpdateTarget,
+    withDeleteTarget,
+    withFormData('target'),
+    withIsSubmitting,
+    withError,
+    withValidationErrors,
+    withState('editMode', 'setEditMode', ({ editMode }) => editMode),
+    withHandlers({
+        onSubmit: ({
+            formData,
+            setValidationErrors,
+            setIsSubmitting,
+            setEditMode,
+            updateTarget,
+            target
+        }) => event => {
+            event.preventDefault();
+            // // validate however
+            if (formData.name.length === 0) {
+                return setValidationErrors({ name: 'Name is required' });
+            }
+            setValidationErrors({});
+            setIsSubmitting(true);
+
+            updateTarget({
+                variables: {
+                    input: {
+                        ...formData,
+                        id: undefined,
+                        contacts: undefined,
+                        __typename: undefined,
+                        contactIds: formData.contacts ? formData.contacts.map(contact => contact.id) : undefined
+                    },
+                    id: target.id
+                }
+            }).then(({ data: { updateTarget } }) => {
+                setIsSubmitting(false);
+                setEditMode(false);
+            })
+
+        },
+        handleDelete: ({
+            history,
+            target,
+            deleteTarget
+        }) => event => {
+            event.preventDefault();
+            deleteTarget({
+                variables: {
+                    id: target.id
+                }
+            }).then(({ data: { deleteTarget } }) => {
+                if (deleteTarget) {
+                    history.push('/targets');
+                }
+            })
+
+        },
+    })
+);
+
+
 const Target = ({
     target,
-    deleteTarget,
+    handleDelete,
     editMode,
     error,
     errors,
@@ -52,13 +119,13 @@ const Target = ({
                                 value={formData.status}
                                 type="text"
                                 className="form-control"
-                                name="street"
-                                id="street"
+                                name="status"
+                                id="status"
                                 placeholder="Status"
                                 onChange={onChange} />
                             {errors.status ? <div class="invalid-feedback">{errors.status}</div> : null}
                         </div>
-                       
+                    
                         {editMode ? (
                             <div className="form-group">
                                 <button type="submit" className="btn btn-primary mr-2">{isSubmitting ? "Saving..." : "Save Changes"}</button>
@@ -72,51 +139,17 @@ const Target = ({
                             {error ? <div className="invalid-feedback">{error}</div> : null}
                         </div>
                     </form>
+                  
                 </div>
 
             </div>
-            {/* <ActionModal
+            <ActionModal
                 modalId={DELETE_MODAL_ID}
-                action={() => deleteTarget(project)}
-                title={project.name}
-                message="Are you sure you want to delete this project?"
-                actionText="Delete" /> */}
+                action={handleDelete}
+                title={target.name}
+                message="Are you sure you want to delete this target?"
+                actionText="Delete" />
         </div>
     )
 
-export default compose(
-    withFormData('target'),
-    withIsSubmitting,
-    withError,
-    withValidationErrors,
-    withState('editMode', 'setEditMode', ({ editMode }) => editMode),
-    withHandlers({
-        onSubmit: ({
-            formData,
-            setValidationErrors,
-            setIsSubmitting,
-            setEditMode,
-            setError,
-            setFormData,
-            setOutput,
-            updateTarget,
-            project
-        }) => event => {
-            // event.preventDefault();
-            // // validate however
-            // if (formData.name.length === 0) {
-            //     return setValidationErrors({ name: 'Name is required' });
-            // }
-            // setValidationErrors({});
-
-            // setIsSubmitting(true);
-
-            // updateTarget(project, { ...formData }).then(() => {
-            //     setEditMode(false);
-            //     setIsSubmitting(false);
-            //     setError(null);
-            // });
-
-        },
-    })
-)(Target);
+export default enhance(Target);

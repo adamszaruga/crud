@@ -21,6 +21,6 @@ module.exports = {
     mutations: `
         createTarget(input: TargetInput): Target
         updateTarget(id: ID!, input: TargetInput): Target
-        deleteTarget(id: ID!): Boolean
+        deleteTarget(id: ID!): ID
     `
 }
