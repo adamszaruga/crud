@@ -79,3 +79,9 @@ mutation DeleteContact($id: ID!) {
     deleteContact(id: $id) 
 }
 `;
+
+export const ToggleBookmark = gql`
+mutation ToggleBookmark($id: ID!, $type: String) {
+    toggleBookmark(id: $id, type: $type) @client
+}
+`

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Target, User } from 'react-feather';
 import { NavLink } from 'react-router-dom';
+import Bookmarks from './Bookmarks';
 
 class Sidebar extends Component {
     render() {
@@ -24,20 +25,7 @@ class Sidebar extends Component {
                     <h6 className="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
                         <span>Bookmarks</span>
                     </h6>
-                    <ul className="nav flex-column mb-2">
-                        <li className="nav-item">
-                            <a className="nav-link" href="#">
-                                <User className="feather" />
-                                Bob Thornton
-                            </a>
-                        </li>
-                        <li className="nav-item">
-                            <a className="nav-link" href="#">
-                                <Target className="feather" />
-                                Williams & Son
-                            </a>
-                        </li>
-                    </ul>
+                    <Bookmarks />
                 </div>
             </nav>
         );

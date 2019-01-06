@@ -1,10 +1,11 @@
 import React from 'react';
-import { Target as TargetIcon, Trash2, Edit2 } from 'react-feather';
+import { Target as TargetIcon, Trash2, Edit2, Bookmark } from 'react-feather';
 import { compose, withHandlers, withState } from 'recompose';
 import { withRouter } from 'react-router-dom';
 import { withFormData, withIsSubmitting, withError, withValidationErrors } from '../HOCs/forms';
 import withUpdateTarget from '../HOCs/UpdateTargetMutation';
-import withDeleteTarget from '../HOCs/DeleteTargetMutation'
+import withDeleteTarget from '../HOCs/DeleteTargetMutation';
+import withToggleBookmark from '../HOCs/ToggleBookmarkMutation';
 import ActionModal from './ActionModal';
 
 let DELETE_MODAL_ID = "deleteModal";
@@ -13,6 +14,7 @@ const enhance = compose(
     withRouter,
     withUpdateTarget,
     withDeleteTarget,
+    withToggleBookmark,
     withFormData('target'),
     withIsSubmitting,
     withError,
@@ -69,6 +71,18 @@ const enhance = compose(
             })
 
         },
+        handleBookmarkToggle: ({
+            toggleBookmark,
+            target
+        }) => event => {
+            event.preventDefault();
+            toggleBookmark({
+                variables: {
+                    id: target.id,
+                    type: "target"
+                }
+            });
+        }
     })
 );
 
@@ -84,7 +98,8 @@ const Target = ({
     onChange,
     isSubmitting,
     setFormData,
-    formData
+    formData,
+    handleBookmarkToggle
 }) => (
         <div className="w-75 bg-light ml-2 position-relative item" style={{ minHeight: "530px" }}>
             <div className="position-fixed w-100 m-2">
@@ -107,7 +122,8 @@ const Target = ({
                                     {errors.name ? <div class="invalid-feedback">{errors.name}</div> : null}
                                 </div>
                             ) : formData.name}
-                            <a href="#" onClick={() => setEditMode(true)} className="text-secondary ml-auto mr-2"  ><Edit2 className="feather" /></a>
+                            <a href="#" onClick={handleBookmarkToggle} className={`ml-auto mr-2 ${target.isBookmarked ? 'text-bookmark' : 'text-secondary'}`}  ><Bookmark className="feather" /></a>
+                            <a href="#" onClick={() => setEditMode(true)} className="text-secondary mr-2"  ><Edit2 className="feather" /></a>
                             <a href="#" className="text-secondary" data-toggle="modal" data-target={"#" + DELETE_MODAL_ID}><Trash2 className="feather " /></a>
                         </div>
 

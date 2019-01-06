@@ -9,8 +9,14 @@ import App from './App';
 import * as serviceWorker from './serviceWorker';
 import ApolloClient from 'apollo-boost';
 import { ApolloProvider } from "react-apollo";
+import { defaults, resolvers, typeDefs } from "./GraphQL/local";
 
-const client = new ApolloClient();
+const client = new ApolloClient({
+    clientState: {
+        defaults,
+        resolvers
+    }
+});
 
 ReactDOM.render(
     <ApolloProvider client={client}>

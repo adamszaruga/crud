@@ -6,7 +6,7 @@ export default (WrappedComponent) => {
     return (props) => (
         <Query query={GetTargets}>
             {({ loading, error, data }) => {
-                return <WrappedComponent loading={loading} error={error} data={data} {...props} />;
+                return <WrappedComponent targetsLoading={loading} targetsError={error} targetsData={data} {...props} />;
             }}
         </Query>
     )

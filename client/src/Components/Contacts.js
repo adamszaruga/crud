@@ -1,5 +1,5 @@
 import React from 'react';
-import { Target, Briefcase, Map } from 'react-feather';
+import { Target } from 'react-feather';
 import { compose, withHandlers, withState } from 'recompose';
 import { withRouter, NavLink, Route } from 'react-router-dom';
 import Contact from './Contact.js';
@@ -26,7 +26,7 @@ const enhance = compose(
             });
         },
         filterContacts: props => () => {
-            return props.data.getContacts.filter((contact) => {
+            return props.contactsData.getContacts.filter((contact) => {
                 var keys = Object.keys(contact);
                 for (var i = 0; i < keys.length; i++) {
                     if (keys[i] !== "__typename" && keys[i] !== "id") {
@@ -51,10 +51,10 @@ const enhance = compose(
 
 
 
-const Contacts = ({ data, loading, error, addContact, filterContacts, setFilter, match }) => (
-loading
+const Contacts = ({ contactsData, contactsLoading, contactsError, addContact, filterContacts, setFilter, match }) => (
+contactsLoading
     ? "loading"
-    : error 
+    : contactsError 
         ? "error"
         :<div>
             <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
@@ -71,7 +71,7 @@ loading
                         <input onInput={(e) => setFilter(e.target.value.toLowerCase())} className="form-control form-control-dark w-100" type="text" placeholder="Quick Search" aria-label="Search" />
                     </div>
                     {
-                        data.getContacts.length === 0
+                        contactsData.getContacts.length === 0
                             ? 'No contacts'
                             : filterContacts().map((contact) => (
                                 <NavLink exact to={`${match.path}/${contact.id}`} className="list-group-item list-group-item-action flex-column align-items-start" key={contact.id}>
@@ -91,7 +91,7 @@ loading
                 </div>
                 {
                     <Route exact path={`${match.path}/:id`} render={({ match }) => {
-                        let contact = data.getContacts.find(contact => contact.id === match.params.id);
+                        let contact = contactsData.getContacts.find(contact => contact.id === match.params.id);
                         return contact
                             ? <Contact key={contact.id}
                                 contact={contact}

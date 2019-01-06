@@ -25,7 +25,7 @@ const enhance = compose(
             });
         },
         filterTargets: props => () => {
-            return props.data.getTargets.filter((target) => {
+            return props.targetsData.getTargets.filter((target) => {
                 var keys = Object.keys(target);
                 for (var i = 0; i < keys.length; i++) {
                     if (keys[i] !== "__typename" && keys[i] !== "id")  {
@@ -59,10 +59,10 @@ const STATUS_COLORS = {
 const NEW_TARGET_NAME = 'New Target'
 const NEW_TARGET_STATUS = 'researching'
 
-const Targets = ({data, loading, error, filterTargets, setFilter, match, addTarget}) => (
-loading
+const Targets = ({targetsData, targetsLoading, targetsError, filterTargets, setFilter, match, addTarget}) => (
+targetsLoading
 ? 'loading'
-: error
+: targetsError
     ? 'error'
     : <div>
         <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
@@ -79,7 +79,7 @@ loading
                     <input onInput={(e) => setFilter(e.target.value.toLowerCase())} className="form-control form-control-dark w-100" type="text" placeholder="Quick Search" aria-label="Search" />
                 </div>
                 {
-                    data.getTargets.length === 0
+                    targetsData.getTargets.length === 0
                     ? 'No targets'
                     : filterTargets().map((target) => (
                         <NavLink exact to={`/targets/${target.id}`} className="list-group-item list-group-item-action flex-column align-items-start" key={target.id}>
@@ -100,7 +100,7 @@ loading
             </div>
             {
                 <Route exact path={`${match.path}/:id`} render={({ match }) => {
-                    let target = data.getTargets.find(target => target.id === match.params.id);
+                    let target = targetsData.getTargets.find(target => target.id === match.params.id);
                     return target
                         ? 
                             <Target key={target.id}

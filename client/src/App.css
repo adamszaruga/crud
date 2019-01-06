@@ -109,6 +109,9 @@ body {
   width: 30%!important;
 }
 
+.text-bookmark {
+  color: #007bff
+}
 /* loading spinner */
 .lds-default {
   display: inline-block;

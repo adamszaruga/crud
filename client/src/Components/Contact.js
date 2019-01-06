@@ -1,10 +1,11 @@
 import React from 'react';
-import { User, Trash2, Edit2 } from 'react-feather';
+import { User, Trash2, Edit2, Bookmark } from 'react-feather';
 import { compose, withHandlers, withState } from 'recompose';
 import { withRouter } from 'react-router-dom';
 import { withFormData, withIsSubmitting, withError, withValidationErrors } from '../HOCs/forms';
 import withUpdateContact from '../HOCs/UpdateContactMutation';
 import withDeleteContact from '../HOCs/DeleteContactMutation';
+import withToggleBookmark from '../HOCs/ToggleBookmarkMutation';
 import ActionModal from './ActionModal';
 
 let DELETE_MODAL_ID = "deleteModal";
@@ -13,6 +14,7 @@ const enhance = compose(
     withRouter,
     withUpdateContact,
     withDeleteContact,
+    withToggleBookmark,
     withFormData('contact'),
     withIsSubmitting,
     withError,
@@ -68,6 +70,18 @@ const enhance = compose(
             })
 
         },
+        handleBookmarkToggle: ({
+            toggleBookmark,
+            contact
+        }) => event => {
+            event.preventDefault();
+            toggleBookmark({
+                variables: {
+                    id: contact.id,
+                    type: "contact"
+                }
+            });
+        }
     })
 );
 
@@ -83,7 +97,8 @@ const Contact = ({
     onChange,
     isSubmitting,
     setFormData,
-    formData
+    formData,
+    handleBookmarkToggle
 }) => (
         <div className="w-75 bg-light ml-2 position-relative item" style={{ minHeight: "530px" }}>
             <div className="position-fixed w-100 m-2">
@@ -106,7 +121,8 @@ const Contact = ({
                                     {errors.name ? <div class="invalid-feedback">{errors.name}</div> : null}
                                 </div>
                             ) : formData.name}
-                            <a href="#" onClick={() => setEditMode(true)} className="text-secondary ml-auto mr-2"  ><Edit2 className="feather" /></a>
+                            <a href="#" onClick={handleBookmarkToggle} className={`ml-auto mr-2 ${contact.isBookmarked ? 'text-bookmark' : 'text-secondary'}`}  ><Bookmark className="feather" /></a>
+                            <a href="#" onClick={() => setEditMode(true)} className="text-secondary mr-2"  ><Edit2 className="feather" /></a>
                             <a href="#" className="text-secondary" data-toggle="modal" data-target={"#" + DELETE_MODAL_ID}><Trash2 className="feather " /></a>
                         </div>
 
