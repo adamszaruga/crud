@@ -7,6 +7,9 @@ const schema = require('./graphql/schema');
 const root = require('./graphql/resolvers');
 
 var app = express();
+
+app.use(express.static(__dirname + '/client/build'));
+
 app.use('/graphql', graphqlHTTP({
     schema: schema,
     rootValue: root,

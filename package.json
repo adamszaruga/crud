@@ -4,6 +4,7 @@
   "description": "Basic CRUD operations",
   "main": "app.js",
   "scripts": {
+    "postinstall": "cd client && npm install && npm run build && cd ..",
     "start": "node app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
