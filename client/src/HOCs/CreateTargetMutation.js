@@ -9,9 +9,10 @@ export default (WrappedComponent) => {
             mutation={CreateTarget}
             update={(cache, { data: { createTarget } }) => {
                 const { getTargets } = cache.readQuery({ query: GetTargets });
+                let newTargets = getTargets.concat({...createTarget, isBookmarked:false, contactIds: createTarget.contacts.map(({id})=>id)});
                 cache.writeQuery({
                     query: GetTargets,
-                    data: { getTargets: getTargets.concat([createTarget]) }
+                    data: { getTargets: newTargets }
                 })
             }}
         >

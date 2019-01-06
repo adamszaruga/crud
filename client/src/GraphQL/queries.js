@@ -13,6 +13,7 @@ query GetContacts {
             id
             name
         }
+        targetId @client
     }
 }`;
 
@@ -29,5 +30,6 @@ query GetTargets {
             phone
             email
         }
+        contactIds @client
     }
 }`;

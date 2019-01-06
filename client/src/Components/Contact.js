@@ -1,17 +1,21 @@
 import React from 'react';
-import { User, Trash2, Edit2, Bookmark } from 'react-feather';
+import { User, Trash2, Edit2, Bookmark, Target } from 'react-feather';
 import { compose, withHandlers, withState } from 'recompose';
 import { withRouter } from 'react-router-dom';
 import { withFormData, withIsSubmitting, withError, withValidationErrors } from '../HOCs/forms';
 import withUpdateContact from '../HOCs/UpdateContactMutation';
 import withDeleteContact from '../HOCs/DeleteContactMutation';
 import withToggleBookmark from '../HOCs/ToggleBookmarkMutation';
+import withTargets from '../HOCs/TargetsQuery';
+import { GetTargets } from '../GraphQL/queries';
+
 import ActionModal from './ActionModal';
 
 let DELETE_MODAL_ID = "deleteModal";
 
 const enhance = compose(
     withRouter,
+    withTargets,
     withUpdateContact,
     withDeleteContact,
     withToggleBookmark,
@@ -35,18 +39,20 @@ const enhance = compose(
             }
             setValidationErrors({});
             setIsSubmitting(true);
-
+            let refetchQueries = formData.targetId ? [{query: GetTargets}] : [];
             updateContact({
                 variables: {
                     input: {
                         ...formData,
                         id: undefined,
                         target: undefined,
+                        isBookmarked: undefined,
                         __typename: undefined,
-                        targetId: formData.target ? formData.target.id : undefined
+                        targetId: formData.targetId ? formData.targetId : undefined
                     },
                     id: contact.id
-                }
+                },
+                refetchQueries
             }).then(({ data: { updateContact } })=>{
                 setIsSubmitting(false);
                 setEditMode(false);
@@ -87,6 +93,7 @@ const enhance = compose(
 
 
 const Contact = ({
+    match,
     contact,
     handleDelete,
     editMode,
@@ -98,7 +105,10 @@ const Contact = ({
     isSubmitting,
     setFormData,
     formData,
-    handleBookmarkToggle
+    handleBookmarkToggle,
+    targetsData,
+    targetsError,
+    targetsLoading
 }) => (
         <div className="w-75 bg-light ml-2 position-relative item" style={{ minHeight: "530px" }}>
             <div className="position-fixed w-100 m-2">
@@ -169,6 +179,27 @@ const Contact = ({
                                 placeholder="Email"
                                 onChange={onChange} />
                             {errors.email ? <div class="invalid-feedback">{errors.email}</div> : null}
+                        </div>
+                        
+                        <div className="form-group">
+                            <label htmlFor="targetId">Target Company</label>
+                            {
+                                targetsLoading ? 'loading' : targetsError ? '' :
+                                    <select
+                                        required
+                                        disabled={!editMode}
+                                        value={formData.targetId || "none"}
+                                        className="form-control"
+                                        name="targetId"
+                                        id="targetId"
+                                        onChange={onChange}>
+                                        {targetsData.getTargets.map(target => (
+                                            <option key={target.id} value={target.id}>{target.name}</option>
+                                        ))}
+                                        <option key="default" value="none" className="d-none">No Target Company</option>
+                                    </select>
+                            }
+                            
                         </div>
 
                         {editMode ? (

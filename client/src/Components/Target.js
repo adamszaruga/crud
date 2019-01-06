@@ -1,17 +1,20 @@
 import React from 'react';
-import { Target as TargetIcon, Trash2, Edit2, Bookmark } from 'react-feather';
+import { Target as TargetIcon, Trash2, Edit2, Bookmark, User } from 'react-feather';
 import { compose, withHandlers, withState } from 'recompose';
-import { withRouter } from 'react-router-dom';
+import { withRouter, NavLink } from 'react-router-dom';
 import { withFormData, withIsSubmitting, withError, withValidationErrors } from '../HOCs/forms';
+import withContacts from '../HOCs/ContactsQuery';
 import withUpdateTarget from '../HOCs/UpdateTargetMutation';
 import withDeleteTarget from '../HOCs/DeleteTargetMutation';
 import withToggleBookmark from '../HOCs/ToggleBookmarkMutation';
+import { GetContacts, GetTargets } from '../GraphQL/queries';
 import ActionModal from './ActionModal';
 
 let DELETE_MODAL_ID = "deleteModal";
 
 const enhance = compose(
     withRouter,
+    withContacts,
     withUpdateTarget,
     withDeleteTarget,
     withToggleBookmark,
@@ -43,11 +46,12 @@ const enhance = compose(
                         ...formData,
                         id: undefined,
                         contacts: undefined,
-                        __typename: undefined,
-                        contactIds: formData.contacts ? formData.contacts.map(contact => contact.id) : undefined
+                        isBookmarked: undefined,
+                        __typename: undefined
                     },
                     id: target.id
-                }
+                },
+                refetchQueries: [{query: GetContacts}, {query: GetTargets}]
             }).then(({ data: { updateTarget } }) => {
                 setIsSubmitting(false);
                 setEditMode(false);
@@ -82,6 +86,23 @@ const enhance = compose(
                     type: "target"
                 }
             });
+        },
+        handleRemoveContact: ({
+            formData,
+            setFormData
+        }) => (event, contactId) => {
+            event.preventDefault();
+            event.stopPropagation();
+            let contactIds = formData.contactIds.filter(id => id !== contactId);
+            setFormData({...formData, contactIds});
+        },
+        handleAddContact: ({
+            setFormData,
+            formData
+        }) => (event, contactId) => {
+            event.preventDefault();
+            let contactIds = formData.contactIds.concat(contactId);
+            setFormData({ ...formData, contactIds });
         }
     })
 );
@@ -99,7 +120,12 @@ const Target = ({
     isSubmitting,
     setFormData,
     formData,
-    handleBookmarkToggle
+    handleBookmarkToggle,
+    handleRemoveContact,
+    handleAddContact,
+    contactsLoading,
+    contactsError,
+    contactsData
 }) => (
         <div className="w-75 bg-light ml-2 position-relative item" style={{ minHeight: "530px" }}>
             <div className="position-fixed w-100 m-2">
@@ -129,19 +155,52 @@ const Target = ({
 
                         <div className="form-group">
                             <label htmlFor="status">Status</label>
-                            <input
+                            <select
                                 required
-                                readOnly={!editMode}
+                                disabled={!editMode}
                                 value={formData.status}
                                 type="text"
                                 className="form-control"
                                 name="status"
                                 id="status"
                                 placeholder="Status"
-                                onChange={onChange} />
+                                onChange={onChange}>
+                                <option value="pending">Pending</option>
+                                <option value="researching">Researching</option>
+                                <option value="approved">Approved</option>
+                                <option value="declined">Declined</option>
+                            </select>
                             {errors.status ? <div class="invalid-feedback">{errors.status}</div> : null}
                         </div>
-                    
+                        <div className="list-group list-group-flush w-100 mb-3">
+                            {   
+                                contactsLoading ? 'loading' : contactsError ? 'error'
+                                : formData.contactIds.map(contactId=>(
+                                    <NavLink exact to={`/contacts/${contactId}`} className="list-group-item list-group-item-action d-flex align-items-center" key={contactId}>
+                                        <User className="feather mr-2" style={{ marginTop: "0.16rem" }} />
+                                        <span>{contactsData.getContacts.find(({id})=>id===contactId).name}</span>
+                                        <span className="ml-auto">{contactsData.getContacts.find(({ id }) => id === contactId).phone}</span>
+                                        {editMode ?<button type="button" className="ml-2 close" aria-label="Close" onClick={(e)=>{handleRemoveContact(e, contactId)}}>
+                                            <span aria-hidden="true">&times;</span>
+                                        </button> : ''}
+                                    </NavLink> 
+                                ))
+                            }            
+                        </div>
+                        {editMode ? (
+                            <div className="form-group">
+                                <div className="dropdown">
+                                    <button className="btn btn-link dropdown-toggle" type="button" id="addContactButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        Add Contact
+                                    </button>
+                                    <div className="dropdown-menu" aria-labelledby="addContactButton">
+                                        {contactsData.getContacts.filter(contact=>!formData.contactIds.includes(contact.id)).map(contact => (
+                                            <a key={contact.id} className="dropdown-item" onClick={e => handleAddContact(e, contact.id)} href="#">{contact.name}</a>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        ) : null}
                         {editMode ? (
                             <div className="form-group">
                                 <button type="submit" className="btn btn-primary mr-2">{isSubmitting ? "Saving..." : "Save Changes"}</button>

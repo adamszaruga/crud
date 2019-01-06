@@ -15,7 +15,8 @@ export const resolvers = {
             })
 
             return bookmark ? true : false
-        }
+        },
+        targetId: ({ target }) => target ? target.id : null
     },
     Target: {
         isBookmarked: ({ id }, variables, { cache }) => {
@@ -26,7 +27,8 @@ export const resolvers = {
             })
 
             return bookmark ? true : false
-        }
+        },
+        contactIds: ({ contacts }) => contacts.map(({id})=>id)
     },
     Mutation: {
         toggleBookmark(_, {id, type}, { cache, getCacheKey }) {
